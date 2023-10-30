@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:tanker/src/car/car_view.dart';
 import 'package:tanker/src/controllers.dart';
 import 'package:tanker/src/fuel/fuel_view.dart';
 import 'package:tanker/src/settings/settings_view.dart';
 
-class TankerApp extends StatefulWidget {
+class TankerApp extends StatelessWidget {
   const TankerApp({
     super.key,
     required this.controllers,
@@ -14,24 +13,17 @@ class TankerApp extends StatefulWidget {
   final Controllers controllers;
 
   @override
-  State<TankerApp> createState() => _TankerAppState();
-}
-
-class _TankerAppState extends State<TankerApp> {
-  int _currentPageIndex = 0;
-
-  @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: widget.controllers.settingsController,
+      animation: controllers.settingsController,
       builder: (BuildContext context, Widget? child) {
         return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          restorationScopeId: 'app',
-          theme: ThemeData(),
-          darkTheme: ThemeData.dark(),
-          themeMode: widget.controllers.settingsController.themeMode,
-          onGenerateRoute: _onGenerateRoute
+            debugShowCheckedModeBanner: false,
+            restorationScopeId: 'app',
+            theme: ThemeData(),
+            darkTheme: ThemeData.dark(),
+            themeMode: controllers.settingsController.themeMode,
+            onGenerateRoute: _onGenerateRoute
         );
       },
     );
@@ -46,50 +38,16 @@ class _TankerAppState extends State<TankerApp> {
 
   Widget _getAppLayout(BuildContext context) {
     return Scaffold(
-      body: _getAppPages()[_currentPageIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentPageIndex,
-        onTap: (newPageIdx) => setState(() {
-          _currentPageIndex = newPageIdx;
-        }),
-        items: _getAppPageItems()
-      ),
+      body: FuelView(controllers),
       appBar: AppBar(
-        title: Text(_getAppPageTitles()[_currentPageIndex]),
+        title: const Text("Tanker"),
         actions: [
           IconButton(
             icon: const Icon(MdiIcons.cog),
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (builder) => SettingsView(controllers: widget.controllers))),
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (builder) => SettingsView(controllers: controllers))),
           )
         ],
       ),
     );
-  }
-
-  List<String> _getAppPageTitles() {
-    return [
-      "Brandstof",
-      "Auto",
-    ];
-  }
-
-  List<Widget> _getAppPages() {
-    return [
-      FuelView(widget.controllers),
-      CarView(widget.controllers),
-    ];
-  }
-
-  List<BottomNavigationBarItem> _getAppPageItems() {
-    return [
-      const BottomNavigationBarItem(
-        label: "Brandstof",
-        icon: Icon(MdiIcons.gasStationOutline),
-      ),
-      const BottomNavigationBarItem(
-        label: "Auto",
-        icon: Icon(MdiIcons.car),
-      )
-    ];
   }
 }

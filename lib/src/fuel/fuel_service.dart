@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:localstore/localstore.dart';
 
 class TankEntry {
-  final int id, litersTanked, tankedAtKm;
+  final int id, tankedAtKm;
   final DateTime tankedAt;
-  final double tankedForEur;
+  final double tankedForEur, litersTanked;
 
   const TankEntry({required this.id, required this.litersTanked, required this.tankedAtKm, required this.tankedAt, required this.tankedForEur});
 

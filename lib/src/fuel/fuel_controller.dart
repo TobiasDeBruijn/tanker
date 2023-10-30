@@ -8,53 +8,27 @@ class FuelController with ChangeNotifier {
   List<TankEntry> _tankEntries = [];
   List<TankEntry> get tankEntries => _tankEntries;
 
-  double getDaysPerTank() {
-    int totalDays = _getTotalHours();
-    int timesTanked = tankEntries.length;
-    
-    return (totalDays.toDouble() / timesTanked.toDouble()) / 24;
-  }
-
-  int _getTotalHours() {
-    int totalDays = 0;
-    DateTime? previousDate;
-
-    for(TankEntry tankEntry in tankEntries) {
-      if(previousDate == null) {
-        previousDate = tankEntry.tankedAt;
-      } else {
-        totalDays += tankEntry.tankedAt.difference(previousDate).inHours;
-      }
-    }
-
-    return totalDays;
-  }
-
   double getAvgKmPerLiter() {
-    int totalKm = _getTotalKm(); 
-    int totalLiter = _getTotalLiter();
+    int totalKm = _getTotalKm();
+    double totalLiter = _getTotalLiter();
 
-    return totalKm.toDouble() / totalLiter.toDouble();
+    return totalKm.abs() / totalLiter.abs();
   }
   
   double getAvgEurPerLiter() {
-    int totalLiter = _getTotalLiter();
-    double totalEur = _getTotalEur();
-
-    return totalEur / totalLiter.toDouble();
-  }
-  
-  double _getTotalEur() {
-    return tankEntries
-        .map((e) => e.tankedForEur)
+    double allAvgs = tankEntries
+        .map((e) => e.tankedForEur / e.litersTanked)
+        .toList()
         .fold(0, (previous, current) => previous + current);
+
+    return allAvgs / tankEntries.length;
   }
-  
+
   int _getTotalKm() {
-    return tankEntries.isNotEmpty ? tankEntries.last.tankedAtKm - tankEntries.first.tankedAtKm : 0;
+    return tankEntries.isNotEmpty ? tankEntries.first.tankedAtKm - tankEntries.last.tankedAtKm : 0;
   }
   
-  int _getTotalLiter() {
+  double _getTotalLiter() {
     return tankEntries
         .map((e) => e.litersTanked)
         .fold(0, (previous, current) => previous + current);

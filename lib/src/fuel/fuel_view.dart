@@ -80,20 +80,6 @@ class FuelView extends StatelessWidget {
                             )
                           ],
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                const Padding(
-                                  padding: EdgeInsets.only(right: 4.0),
-                                  child: Icon(MdiIcons.clock),
-                                ),
-                                Text("${_formatNaN(controllers.fuelController.getDaysPerTank(), 3)} dagen/tank", style: GoogleFonts.roboto()),
-                              ],
-                            ),
-                          ],
-                        )
                       ],
                     ),
                   ),
@@ -108,7 +94,7 @@ class FuelView extends StatelessWidget {
                 Expanded(
                   child: ListView.builder(
                     itemCount: controllers.fuelController.tankEntries.length,
-                    itemBuilder: (context, index) => _TankEntryViewWithContext(tankEntry: controllers.fuelController.tankEntries[index], controllers: controllers),
+                    itemBuilder: (context, index) => _TankEntryViewWithContext(tankEntry: _sortedTankEntries()[index], controllers: controllers),
                   ),
                 ),
               ],
@@ -121,6 +107,12 @@ class FuelView extends StatelessWidget {
         onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (builder) => _CreateTankEntryView(controllers))),
       ),
     );
+  }
+
+  List<TankEntry> _sortedTankEntries() {
+    List<TankEntry> copy = controllers.fuelController.tankEntries;
+    copy.sort((a, b) => b.tankedAt.compareTo(a.tankedAt));
+    return copy;
   }
 
   String _formatNaN(double f, int fractionDigits) {
@@ -166,7 +158,7 @@ class _CreateTankEntryViewState extends State<_CreateTankEntryView> {
                   suffixText: "L",
                   icon: Icon(MdiIcons.gasStationOutline),
                 ),
-                validator: _validateUint,
+                validator: _validateUdouble,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
               ),
               TextFormField(
@@ -204,7 +196,7 @@ class _CreateTankEntryViewState extends State<_CreateTankEntryView> {
 
           TankEntry entry = TankEntry(
             id: ids.isNotEmpty ? ids.last + 1 : 1,
-            litersTanked: int.parse(_litersTankedController.text),
+            litersTanked: double.parse(_litersTankedController.text),
             tankedAtKm: int.parse(_tankedAtKmController.text),
             tankedAt: DateTime.now(),
             tankedForEur: double.parse(_tankedForEurController.text),
